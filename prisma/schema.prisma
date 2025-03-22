@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
+  password  String
+  provas    Prova[] 
+}
+
+model Materia {
+  id       Int      @id @default(autoincrement())
+  materia  String
+  assuntos Assunto[]
+  provas   Prova[]  
+}
+
+model Assunto {
+  id        Int      @id @default(autoincrement())
+  assunto   String
+  materia   Materia  @relation(fields: [materiaId], references: [id])
+  materiaId Int
+  questoes  Questao[]  
+  provas    ProvaAssunto[]
+}
+
+model Questao {
+  id           Int            @id @default(autoincrement())
+  enunciado    String
+  assuntoId    Int
+  assunto      Assunto        @relation(fields: [assuntoId], references: [id])
+  alternativas Alternativa[]  
+  provas       ProvaQuestao[] 
+}
+
+model Alternativa {
+  id         Int      @id @default(autoincrement())
+  texto      String
+  isCorrect  Boolean
+  questaoId  Int
+  questao    Questao  @relation(fields: [questaoId], references: [id])
+}
+
+model Prova {
+  id          Int      @id @default(autoincrement())
+  usuario     User     @relation(fields: [usuarioId], references: [id])
+  usuarioId   Int
+  materia     Materia  @relation(fields: [materiaId], references: [id])
+  materiaId   Int
+  inicioTempo DateTime
+  fimTempo    DateTime?
+  questoes    ProvaQuestao[]  
+  assuntos    ProvaAssunto[] 
+}
+
+model ProvaQuestao {
+  id         Int      @id @default(autoincrement())
+  prova      Prova    @relation(fields: [provaId], references: [id])
+  provaId    Int
+  questao    Questao  @relation(fields: [questaoId], references: [id])
+  questaoId  Int
+}
+
+model ProvaAssunto {
+  provaId    Int
+  assuntoId  Int
+  prova      Prova    @relation(fields: [provaId], references: [id])
+  assunto    Assunto  @relation(fields: [assuntoId], references: [id])
+
+  @@id([provaId, assuntoId])  
+}

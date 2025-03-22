@@ -1,0 +1,27 @@
+### RegIster a user POST /AUTH/REGISTER 
+POST http://localhost:3333/auth/register
+Content-Type: application/json
+
+{
+    "username": "tssestaaaaae@",
+    "password": "12312311" 
+}
+
+### Login a user POST /AUTH/LOGIN 
+POST http://localhost:3333/auth/LOGIN
+Content-Type: application/json
+
+{
+    "username": "teste",
+    "password": "123123" 
+}
+
+
+### Creates a new todo POST /TODOS (protected) 
+POST http://localhost:3333/prova/criarProva Authorization: 
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNzQyNDEzNDU1LCJleHAiOjE3NDI0OTk4NTV9.6fJGPUlEUr-mzUU-EVmoxg9oz19WJgHOGLax1XQadg0 
+Content-Type: application/json
+
+{
+  "materiaId": 1
+}
