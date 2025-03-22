@@ -12,23 +12,19 @@ router.post('/createExam', async (req, res) => {
     }
 
     try {
-        // Busca a matéria e seus assuntos
         const materia = await prisma.materia.findUnique({
             where: { id: materiaId },
             include: {
-                assuntos: true,  // Inclui os assuntos relacionados à matéria
+                assuntos: true, 
             }
         });
 
-        // Verifica se a matéria foi encontrada e se possui pelo menos 3 assuntos
         if (!materia || materia.assuntos.length < 3) {
             return res.status(400).send({ message: "Não há assuntos suficientes para criar a prova" });
         }
 
-        // Embaralha os assuntos e seleciona 3 deles
         const shuffledAssuntos = materia.assuntos.sort(() => Math.random() - 0.5).slice(0, 3);
 
-        // Cria a prova no banco de dados
         const exam = await prisma.prova.create({
             data: {
                 usuarioId,
@@ -37,9 +33,7 @@ router.post('/createExam', async (req, res) => {
             }
         });
 
-        // Cria as questões para a prova
         for (let assunto of shuffledAssuntos) {
-            // Seleciona 7 questões do assunto atual
             const questoes = await prisma.questao.findMany({
                 where: { assuntoId: assunto.id },
                 take: 7,
@@ -54,10 +48,8 @@ router.post('/createExam', async (req, res) => {
                 }
             });
 
-            // Embaralha as questões e seleciona as 7 primeiras
             const shuffledQuestoes = questoes.sort(() => Math.random() - 0.5).slice(0, 7);
 
-            // Adiciona as questões à prova
             for (let questao of shuffledQuestoes) {
                 await prisma.provaQuestao.create({
                     data: {
@@ -68,7 +60,6 @@ router.post('/createExam', async (req, res) => {
             }
         }
 
-        // Aqui estamos incluindo os detalhes das questões e assuntos associados à prova
         const examWithDetails = await prisma.prova.findUnique({
             where: { id: exam.id },
             include: {
@@ -91,14 +82,13 @@ router.post('/createExam', async (req, res) => {
                 },
                 assuntos: {
                     select: {
-                        provaId: true,  // Incluindo provaId da tabela ProvaAssunto
-                        assuntoId: true,  // Incluindo assuntoId da tabela ProvaAssunto
+                        provaId: true,
+                        assuntoId: true,
                     }
                 }
             }
         });
 
-        // Responde com sucesso sem detalhes das questões ou assuntos
         res.status(201).send({ message: "Prova criada com sucesso" });
 
     } catch (err) {
@@ -111,7 +101,6 @@ router.get('/getExamQuestions/:examId', async (req, res) => {
     const { examId } = req.params;
 
     try {
-        // Buscar a prova com o ID fornecido e incluir as questões e alternativas associadas
         const examDetails = await prisma.prova.findUnique({
             where: { id: parseInt(examId) },
             include: {
@@ -135,12 +124,10 @@ router.get('/getExamQuestions/:examId', async (req, res) => {
             }
         });
 
-        // Verifica se a prova existe
         if (!examDetails) {
             return res.status(404).send({ message: "Prova não encontrada" });
         }
 
-        // Responde com os detalhes da prova, incluindo as questões e alternativas
         res.status(200).send(examDetails.questoes.map(questao => ({
             questaoId: questao.questao.id,
             enunciado: questao.questao.enunciado,
@@ -155,15 +142,12 @@ router.get('/getExamQuestions/:examId', async (req, res) => {
 
 router.get('/getAllMaterias', async (req, res) => {
     try {
-        // Buscar todas as matérias no banco de dados
         const materias = await prisma.materia.findMany();
 
-        // Verifica se há matérias
         if (!materias || materias.length === 0) {
             return res.status(404).send({ message: "Nenhuma matéria encontrada" });
         }
 
-        // Responde com a lista de matérias
         res.status(200).send(materias);
     } catch (err) {
         console.error("Erro ao buscar as matérias:", err);
