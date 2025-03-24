@@ -22,8 +22,8 @@ router.post('/register', async (req, res) => {
             }
         })
 
-        const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, { expiresIn: '24h' });
-        res.json({ token });
+        return res.status(200).send({ message: "Cadastro realizado com sucesso" });
+        
     } catch (err) {
         console.error(err)
         res.status(500).send({ message: "Erro interno" });

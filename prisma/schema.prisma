@@ -75,6 +75,7 @@ model ProvaAssunto {
   assuntoId  Int
   prova      Prova    @relation(fields: [provaId], references: [id])
   assunto    Assunto  @relation(fields: [assuntoId], references: [id])
+  acertos    Int?
 
   @@id([provaId, assuntoId])  
 }
